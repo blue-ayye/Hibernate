@@ -29,6 +29,16 @@ public class User {
 		System.out.println("UserEntity.UserEntity()");
 	}
 	
+	
+	public User(int id, String firstName, String lastName, String email) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+	}
+
+
 	public User(String firstName, String lastName, String email) {
 		super();
 		System.out.println("UserEntity.UserEntity()");
@@ -68,7 +78,7 @@ public class User {
 	@Override
 	public String toString() {
 		return "UserEntity [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
-				+ "]";
+				+ "]" + "\n";
 	}
 
 }

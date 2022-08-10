@@ -1,12 +1,15 @@
 package com.project.dao;
 
 import java.sql.Connection;
+import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 
+import com.project.connection.SessionFactoryProvider;
 import com.project.entity.User;
 
 public class UsersDaoImpl implements UsersDaoInterface {
@@ -14,15 +17,10 @@ public class UsersDaoImpl implements UsersDaoInterface {
 	@Override
 	public void saveUserEntity(User user) {
 		System.out.println("UsersDaoImpl.saveUserEntity()");
-		SessionFactory sessionFactory = null;
 		Session session = null;
 
 		try {
-			Configuration config = new Configuration();
-			config.addAnnotatedClass(User.class);
-			config.configure("hibernate.cfg.xml");
-			sessionFactory = config.buildSessionFactory();
-			session = sessionFactory.openSession();
+			session = SessionFactoryProvider.getSessionFactory().openSession();
 			session.beginTransaction();
 			session.save(user);
 			session.getTransaction().commit();
@@ -33,8 +31,6 @@ public class UsersDaoImpl implements UsersDaoInterface {
 		} finally {
 			if (session != null)
 				session.close();
-			if (sessionFactory != null)
-				sessionFactory.close();
 		}
 
 	}
@@ -42,15 +38,10 @@ public class UsersDaoImpl implements UsersDaoInterface {
 	@Override
 	public void getUserEntityById(int id) {
 		System.out.println("UsersDaoImpl.getUserEntityByID()");
-		SessionFactory sessionFactory = null;
 		Session session = null;
 
 		try {
-			Configuration config = new Configuration();
-			config.addAnnotatedClass(User.class);
-			config.configure("hibernate.cfg.xml");
-			sessionFactory = config.buildSessionFactory();
-			session = sessionFactory.openSession();
+			session = SessionFactoryProvider.getSessionFactory().openSession();
 			session.beginTransaction();
 			User user = session.get(User.class, id);
 			System.out.println("Success!");
@@ -61,23 +52,16 @@ public class UsersDaoImpl implements UsersDaoInterface {
 		} finally {
 			if (session != null)
 				session.close();
-			if (sessionFactory != null)
-				sessionFactory.close();
 		}
 	}
 
 	@Override
 	public void updateUserEntity(User user) {
 		System.out.println("UsersDaoImpl.updateUserEntityById()");
-		SessionFactory sessionFactory = null;
 		Session session = null;
-		
+
 		try {
-			Configuration config = new Configuration();
-			config.addAnnotatedClass(User.class);
-			config.configure("hibernate.cfg.xml");
-			sessionFactory = config.buildSessionFactory();
-			session = sessionFactory.openSession();
+			session = SessionFactoryProvider.getSessionFactory().openSession();
 			session.beginTransaction();
 			session.update(user);
 			session.getTransaction().commit();
@@ -89,25 +73,17 @@ public class UsersDaoImpl implements UsersDaoInterface {
 		} finally {
 			if (session != null)
 				session.close();
-			if (sessionFactory != null)
-				sessionFactory.close();
 		}
-		
+
 	}
-	
 
 	@Override
 	public void saveOrUpdateUserEntity(User user) {
 		System.out.println("UsersDaoImpl.saveOrUpdateUserEntity()");
-		SessionFactory sessionFactory = null;
 		Session session = null;
-		
+
 		try {
-			Configuration config = new Configuration();
-			config.addAnnotatedClass(User.class);
-			config.configure("hibernate.cfg.xml");
-			sessionFactory = config.buildSessionFactory();
-			session = sessionFactory.openSession();
+			session = SessionFactoryProvider.getSessionFactory().openSession();
 			session.beginTransaction();
 			session.saveOrUpdate(user);
 			session.getTransaction().commit();
@@ -119,23 +95,16 @@ public class UsersDaoImpl implements UsersDaoInterface {
 		} finally {
 			if (session != null)
 				session.close();
-			if (sessionFactory != null)
-				sessionFactory.close();
 		}
 	}
 
 	@Override
 	public void deleteUserEntityById(int id) {
 		System.out.println("UsersDaoImpl.deleteUserEntityById()");
-		SessionFactory sessionFactory = null;
 		Session session = null;
-		
+
 		try {
-			Configuration config = new Configuration();
-			config.addAnnotatedClass(User.class);
-			config.configure("hibernate.cfg.xml");
-			sessionFactory = config.buildSessionFactory();
-			session = sessionFactory.openSession();
+			session = SessionFactoryProvider.getSessionFactory().openSession();
 			User user = session.get(User.class, id);
 			session.beginTransaction();
 			session.delete(user);
@@ -148,22 +117,55 @@ public class UsersDaoImpl implements UsersDaoInterface {
 		} finally {
 			if (session != null)
 				session.close();
-			if (sessionFactory != null)
-				sessionFactory.close();
 		}
 	}
 
 	@Override
 	public void getUserEntities() {
-		// TODO Auto-generated method stub
-		
+		System.out.println("UsersDaoImpl.getUserEntities()");
+		Session session = null;
+
+		try {
+			session = SessionFactoryProvider.getSessionFactory().openSession();
+			String hqlQuery = "from User";
+			Query<?> query = session.createQuery(hqlQuery);
+			List<?> userEntities = query.list();
+			System.out.println(userEntities);
+
+		} catch (HibernateException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
 	}
 
 	@Override
 	public void deleteUserEntities() {
-		// TODO Auto-generated method stub
-		
-	}
+		System.out.println("UsersDaoImpl.deleteUserEntities()");
+		Session session = null;
 
+		try {
+			session = SessionFactoryProvider.getSessionFactory().openSession();
+			String hqlQuery = "from User";
+			Query<User> query = session.createQuery(hqlQuery);
+			List<User> userEntities = query.list();
+			int numberOfUsers = userEntities.size();
+			session.beginTransaction();
+			for (User user : userEntities) {
+				session.delete(user);
+			}
+			session.getTransaction().commit();
+			System.out.println("Deleted " + numberOfUsers + " number of users");
+
+		} catch (HibernateException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+	}
 
 }
